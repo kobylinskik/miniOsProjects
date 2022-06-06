@@ -1,0 +1,3 @@
+[submodule "miniOS"]
+	path = miniOS
+	url = https://github.com/kobylinskik/miniOS.git
