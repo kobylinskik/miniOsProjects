@@ -1,0 +1,75 @@
+TARGET = main.elf
+
+CMSIS_DIR = ../miniOS/CMSIS
+CORE_SUPPORT_DIR = $(CMSIS_DIR)/CM3/CoreSupport
+DEVICE_SUPPORT_DIR = $(CMSIS_DIR)/CM3/DeviceSupport/ST/STM32F10x
+
+INC_DIR = ./inc
+SRC_DIR = ./src
+
+PARENT_INC_DIR = ../inc
+PARENT_SRC_DIR = ../src
+
+MINI_OS_DIR = ../miniOS
+MINI_OS_BUILD_DIR = $(MINI_OS_DIR)/build
+
+MEMORY_MANAGER_DIR = $(MINI_OS_DIR)/memoryManager
+MEMORY_MANAGER_INC = $(MEMORY_MANAGER_DIR)/inc
+
+THREAD_MANAGER_DIR = $(MINI_OS_DIR)/threadManager
+THREAD_MANAGER_INC = $(THREAD_MANAGER_DIR)/inc
+
+CIRCULAR_BUFFER_DIR = $(MINI_OS_DIR)/circularBuffer
+CIRCULAR_BUFFER_INC = $(CIRCULAR_BUFFER_DIR)/inc
+
+SYSTICK_DIR = $(MINI_OS_DIR)/sysTick
+SYSTICK_INC = $(SYSTICK_DIR)/inc
+
+MUTEX_DIR = $(MINI_OS_DIR)/mutex
+MUTEX_INC = $(MUTEX_DIR)/inc
+
+INCLUDE_PATHS = -I.
+INCLUDE_PATHS += -I$(INC_DIR)
+INCLUDE_PATHS += -I$(PARENT_INC_DIR)
+INCLUDE_PATHS += -I$(CORE_SUPPORT_DIR)
+INCLUDE_PATHS += -I$(DEVICE_SUPPORT_DIR)
+INCLUDE_PATHS += -I$(MINI_OS_DIR)
+INCLUDE_PATHS += -I$(MEMORY_MANAGER_INC)
+INCLUDE_PATHS += -I$(THREAD_MANAGER_INC)
+INCLUDE_PATHS += -I$(CIRCULAR_BUFFER_INC)
+INCLUDE_PATHS += -I$(SYSTICK_INC)
+INCLUDE_PATHS += -I$(MUTEX_INC)
+
+CC = arm-none-eabi-gcc
+
+CC_FLAGS += -mcpu=cortex-m3
+CC_FLAGS += -mthumb
+CC_FLAGS += $(INCLUDE_PATHS)
+CC_FLAGS += --specs=nosys.specs
+CC_FLAGS += -nostdlib
+CC_FLAGS += -g
+CC_FLAGS += -c
+
+CC_INPUT += $(wildcard $(SRC_DIR)/*.c)
+CC_INPUT += $(wildcard $(PARENT_SRC_DIR)/*.c)
+CC_INPUT += $(DEVICE_SUPPORT_DIR)/startup/gcc_ride7/startup_stm32f10x_ld.s
+
+LD = arm-none-eabi-ld
+
+LINKER_SCRIPT = ../linkerScript.ld
+
+LD_INPUT = $(wildcard ./*.o)
+LD_INPUT += $(wildcard $(MINI_OS_BUILD_DIR)/*.o)
+
+LD_OUTPUT = -o $(TARGET)
+
+LD_FLAGS = -T$(LINKER_SCRIPT)
+LD_FLAGS += -mcpu=cortex-m3
+LD_FLAGS += -mthumb
+LD_FLAGS += --specs=nosys.specs
+LD_FLAGS += -nostdlib
+LD_FLAGS += -g
+
+main:
+	$(CC) $(CC_FLAGS) $(CC_INPUT)
+	$(CC) $(LD_FLAGS) $(LD_INPUT) $(LD_OUTPUT)
